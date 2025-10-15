@@ -437,7 +437,7 @@ def parse_args() -> TrainingConfig:
     parser.add_argument(
         "--config",
         type=str,
-        default=None,
+        default="./config.yaml",
         help="Path to YAML config file",
     )
     parser.add_argument(

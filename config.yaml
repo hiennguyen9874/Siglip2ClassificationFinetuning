@@ -5,10 +5,10 @@ model_name: google/siglip2-so400m-patch16-256
 freeze_vision_backbone: false
 
 # Progressive unfreezing configuration
-progressive_unfreezing: true
-unfreeze_top_layer_epoch: 1
-unfreeze_all_epoch: 2
-num_top_layers_to_unfreeze: 3
+progressive_unfreezing: false
+unfreeze_top_layer_epoch: 3
+unfreeze_all_epoch: 6
+num_top_layers_to_unfreeze: 9
 
 # Data configuration
 data_dir: ./data/helmet-classification-annotated-v2
@@ -18,8 +18,8 @@ oversample: true
 # Training hyperparameters
 train_bs: 16
 eval_bs: 16
-epochs: 10
-lr: 2e-5
+epochs: 20
+lr: 2.0e-5
 weight_decay: 0.02
 warmup_ratio: 0.05
 grad_accum: 2
