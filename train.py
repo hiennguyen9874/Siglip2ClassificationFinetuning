@@ -310,7 +310,7 @@ def setup_model(config: TrainingConfig, num_labels: int, id2label: Dict, label2i
 
 
 def create_weighted_sampler(train_ds, num_labels: int) -> Optional[WeightedRandomSampler]:
-    labels = [int(example["label"]) for example in train_ds]
+    labels = [int(l) for l in train_ds["label"]]
     class_count = np.bincount(labels, minlength=num_labels)
     class_weight = 1.0 / (class_count + 1e-6)
     sample_weight = [class_weight[label] for label in labels]
@@ -654,14 +654,14 @@ def main():
     processor = AutoImageProcessor.from_pretrained(config.model_name)
     size = processor.size.get("shortest_edge", processor.size.get("height", 256))
 
-    train_transform, eval_transform = build_transforms(processor, size)
-    train_ds = train_ds.with_transform(make_set_transform(train_transform))
-    val_ds = val_ds.with_transform(make_set_transform(eval_transform))
-
     sampler = None
     if config.oversample:
         print("Creating weighted sampler for imbalanced dataset...")
         sampler = create_weighted_sampler(train_ds, num_labels)
+
+    train_transform, eval_transform = build_transforms(processor, size)
+    train_ds = train_ds.with_transform(make_set_transform(train_transform))
+    val_ds = val_ds.with_transform(make_set_transform(eval_transform))
 
     print("Setting up trainer...")
     trainer = setup_trainer(config, model, train_ds, val_ds, processor, sampler)
