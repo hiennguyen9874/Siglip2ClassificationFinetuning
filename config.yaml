@@ -1,0 +1,43 @@
+# Siglip2 Fine-tuning Configuration Example
+
+# Model configuration
+model_name: google/siglip2-so400m-patch16-256
+freeze_vision_backbone: false
+
+# Progressive unfreezing configuration
+progressive_unfreezing: true
+unfreeze_top_layer_epoch: 1
+unfreeze_all_epoch: 2
+num_top_layers_to_unfreeze: 3
+
+# Data configuration
+data_dir: ./data/helmet-classification-annotated-v2
+val_split: 0.1
+oversample: true
+
+# Training hyperparameters
+train_bs: 16
+eval_bs: 16
+epochs: 10
+lr: 2e-5
+weight_decay: 0.02
+warmup_ratio: 0.05
+grad_accum: 2
+
+# Mixed precision
+fp16: -1
+bf16: 1
+
+# Logging and checkpointing
+output_dir: ./runs/siglip2-finetune-v2
+logging_steps: 50
+eval_strategy: epoch
+save_strategy: epoch
+save_total_limit: 3
+
+# Reproducibility
+seed: 42
+
+# Hub configuration
+push_to_hub: false
+hub_model_id: null
