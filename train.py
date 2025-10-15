@@ -174,11 +174,7 @@ class ProgressiveUnfreezingCallback(TrainerCallback):
 
     def _unfreeze_all_backbone(self, model):
         for name, param in model.named_parameters():
-            if (
-                "classifier" not in name
-                and "score" not in name
-                and "logit_scale" not in name
-            ):
+            if "classifier" not in name and "score" not in name and "logit_scale" not in name:
                 param.requires_grad = True
 
 
@@ -283,9 +279,7 @@ def setup_dataset(config: TrainingConfig) -> Tuple:
     return train_ds, val_ds, num_labels, id2label, label2id, class_names
 
 
-def setup_model(
-    config: TrainingConfig, num_labels: int, id2label: Dict, label2id: Dict
-):
+def setup_model(config: TrainingConfig, num_labels: int, id2label: Dict, label2id: Dict):
     model = SiglipForImageClassification.from_pretrained(
         config.model_name,
         num_labels=num_labels,
@@ -296,20 +290,12 @@ def setup_model(
     if config.progressive_unfreezing:
         print("Progressive unfreezing enabled - freezing backbone initially...")
         for name, param in model.named_parameters():
-            if (
-                "classifier" not in name
-                and "score" not in name
-                and "logit_scale" not in name
-            ):
+            if "classifier" not in name and "score" not in name and "logit_scale" not in name:
                 param.requires_grad = False
     elif config.freeze_vision_backbone:
         print("Freezing vision backbone...")
         for name, param in model.named_parameters():
-            if (
-                "classifier" not in name
-                and "score" not in name
-                and "logit_scale" not in name
-            ):
+            if "classifier" not in name and "score" not in name and "logit_scale" not in name:
                 param.requires_grad = False
 
     debug_model_architecture(model)
@@ -323,9 +309,7 @@ def setup_model(
     return model
 
 
-def create_weighted_sampler(
-    train_ds, num_labels: int
-) -> Optional[WeightedRandomSampler]:
+def create_weighted_sampler(train_ds, num_labels: int) -> Optional[WeightedRandomSampler]:
     labels = [int(example["label"]) for example in train_ds]
     class_count = np.bincount(labels, minlength=num_labels)
     class_weight = 1.0 / (class_count + 1e-6)
@@ -369,9 +353,7 @@ def setup_trainer(
     total_steps_per_epoch = math.ceil(
         len(train_ds) / (config.train_bs * max(1, torch.cuda.device_count()))
     ) // max(config.grad_accum, 1)
-    warmup_steps = int(
-        config.warmup_ratio * config.epochs * max(total_steps_per_epoch, 1)
-    )
+    warmup_steps = int(config.warmup_ratio * config.epochs * max(total_steps_per_epoch, 1))
 
     training_args = TrainingArguments(
         auto_find_batch_size=True,
@@ -387,9 +369,7 @@ def setup_trainer(
         eval_strategy=config.eval_strategy,
         save_strategy=config.save_strategy,
         save_total_limit=config.save_total_limit,
-        load_best_model_at_end=(
-            config.eval_strategy != "no" and config.save_strategy != "no"
-        ),
+        load_best_model_at_end=(config.eval_strategy != "no" and config.save_strategy != "no"),
         metric_for_best_model="macro_f1",
         fp16=use_fp16,
         bf16=use_bf16,
@@ -452,9 +432,7 @@ def print_classification_report(trainer: Trainer, eval_ds, class_names):
 
 
 def parse_args() -> TrainingConfig:
-    parser = argparse.ArgumentParser(
-        description="Fine-tune Siglip2 for image classification"
-    )
+    parser = argparse.ArgumentParser(description="Fine-tune Siglip2 for image classification")
 
     parser.add_argument(
         "--config",
@@ -668,9 +646,7 @@ def main():
     seed_everything(config.seed)
 
     print(f"Loading dataset from {config.data_dir}...")
-    train_ds, val_ds, num_labels, id2label, label2id, class_names = setup_dataset(
-        config
-    )
+    train_ds, val_ds, num_labels, id2label, label2id, class_names = setup_dataset(config)
 
     print(f"Setting up model: {config.model_name}...")
     model = setup_model(config, num_labels, id2label, label2id)
